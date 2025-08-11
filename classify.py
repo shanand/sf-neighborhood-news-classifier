@@ -16,6 +16,9 @@ from pathlib import Path
 import anthropic
 from dotenv import load_dotenv
 
+# Increase CSV field size limit to handle large articles
+csv.field_size_limit(1000000)  # 1MB limit
+
 
 def load_neighborhoods(neighborhoods_file: str) -> Tuple[List[str], Dict[str, str]]:
     """Load neighborhood data from CSV file."""
@@ -79,12 +82,10 @@ RULES:
 5. Prefer a single neighborhood unless clearly spanning multiple
 6. Multiple neighborhoods should be separated by commas
 
-For the given article, respond with ONLY a JSON object in this exact format:
-{{
-    "neighborhood": "neighborhood_name_or_scope",
-    "confidence": 0.85,
-    "rationale": "Brief explanation of classification reasoning"
-}}
+CRITICAL: You MUST respond with ONLY a valid JSON object. No other text, no explanations, no markdown formatting.
+
+JSON format:
+{{"neighborhood": "neighborhood_name_or_scope", "confidence": 0.85, "rationale": "Brief explanation"}}
 
 ARTICLE TITLE: {{title}}
 
@@ -118,22 +119,29 @@ def classify_article(client: anthropic.Anthropic, prompt_template: str, title: s
         # Parse the response
         response_text = message.content[0].text.strip()
         
-        # Handle potential markdown formatting and extract JSON
+        # Remove any markdown formatting
         if '```json' in response_text:
             response_text = response_text.split('```json')[1].split('```')[0].strip()
         elif '```' in response_text:
             response_text = response_text.split('```')[1].split('```')[0].strip()
         
-        # Try to find JSON object in response
-        if not response_text.startswith('{'):
-            # Look for JSON object in the text
-            start = response_text.find('{')
-            end = response_text.rfind('}') + 1
-            if start >= 0 and end > start:
-                response_text = response_text[start:end]
+        # Clean up the response text
+        response_text = response_text.strip()
+        
+        # Try to find and extract JSON object
+        start = response_text.find('{')
+        end = response_text.rfind('}') + 1
+        
+        if start >= 0 and end > start:
+            json_text = response_text[start:end]
+        else:
+            json_text = response_text
+        
+        # Clean up any stray characters
+        json_text = json_text.strip()
         
         try:
-            result = json.loads(response_text)
+            result = json.loads(json_text)
             
             # Validate required fields
             if not all(key in result for key in ['neighborhood', 'confidence', 'rationale']):
