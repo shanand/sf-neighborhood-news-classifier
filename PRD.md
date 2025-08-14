@@ -84,7 +84,7 @@ Uses **SF Planning Department's official neighborhoods** plus common aliases:
 - **✅ ACHIEVED**: Generated actionable coverage analysis
 - **Measure**: Actionable reports on neighborhood coverage gaps
 
-## Actual Results (December 2024)
+## Actual Results (August 2025)
 
 **Dataset Processed**: 1,641 Mission Local articles (2023-2025)
 - **Successfully Classified**: 1,343 articles (81.8%)

@@ -132,7 +132,7 @@ New Neighborhood,Alternative Name|Another Name
 - **Total Time**: ~2-3 hours for 4,600+ articles
 - **Cost**: Approximately $0.10-0.15 per 1,000 articles (Claude pricing)
 
-## Current Status (December 2024)
+## Current Status (August 2025)
 
 **✅ Phase 1 Complete**: Initial Classification
 - **Dataset**: 1,641 Mission Local articles processed (2023-2025)
